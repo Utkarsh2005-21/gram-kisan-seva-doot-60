@@ -1,14 +1,16 @@
 
-import React, { useState, useRef } from "react";
-import { Mic, ImagePlus, MapPin, FileText } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import NavigationBar from "@/components/NavigationBar";
 import { startSpeechRecognition } from "@/utils/speechRecognition";
+import IssueCategories from "@/components/report/IssueCategories";
+import IssueDescription from "@/components/report/IssueDescription";
+import UrgencyLevel from "@/components/report/UrgencyLevel";
+import LocationInput from "@/components/report/LocationInput";
+import PhotoUpload from "@/components/report/PhotoUpload";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const ReportIssue = () => {
   const { toast } = useToast();
@@ -19,6 +21,7 @@ const ReportIssue = () => {
   const [location, setLocation] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedIssues, setSubmittedIssues] = useState<any[]>([]);
   const recognitionRef = useRef<any>(null);
 
   const issueCategories = [
@@ -30,6 +33,14 @@ const ReportIssue = () => {
     { id: "violence", label: "Domestic Violence" },
     { id: "other", label: "Other Issues" },
   ];
+
+  // Load submitted issues from localStorage on component mount
+  useEffect(() => {
+    const savedIssues = localStorage.getItem("submittedIssues");
+    if (savedIssues) {
+      setSubmittedIssues(JSON.parse(savedIssues));
+    }
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -158,15 +169,37 @@ const ReportIssue = () => {
       duration: 2000,
     });
     
-    // Simulate getting location
-    setTimeout(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // In a real app, we would use these coordinates to get a physical address
+          // For this demo, we'll simulate getting a location
+          setLocation("Current Location: Village Rampur, District Sitapur");
+          toast({
+            title: "Location Found",
+            description: "Your location has been detected.",
+            duration: 2000,
+          });
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          toast({
+            title: "Location Error",
+            description: "Could not access your location. Please enter it manually.",
+            variant: "destructive",
+            duration: 3000,
+          });
+        }
+      );
+    } else {
+      // Fallback for browsers that don't support geolocation
       setLocation("Current Location: Village Rampur, District Sitapur");
       toast({
         title: "Location Found",
         description: "Your location has been detected.",
         duration: 2000,
       });
-    }, 1500);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -183,13 +216,41 @@ const ReportIssue = () => {
     
     setIsSubmitting(true);
     
-    // Simulate API submission
+    // Generate a unique ID for the complaint
+    const complaintId = `COMP-${Date.now().toString().slice(-6)}`;
+    
+    // Create complaint object
+    const newComplaint = {
+      id: complaintId,
+      topic: issueTopic,
+      description: issueDescription,
+      urgency,
+      location,
+      imageUrl: imagePreview,
+      status: "submitted",
+      dateSubmitted: new Date().toISOString(),
+      nextEscalation: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
+      updates: [
+        {
+          status: "Submitted",
+          date: new Date().toISOString(),
+          message: "Your complaint has been recorded in our system."
+        }
+      ]
+    };
+    
+    // Wait 2 seconds to simulate API submission
     setTimeout(() => {
+      // Add to complaints list and save to localStorage
+      const updatedIssues = [...submittedIssues, newComplaint];
+      setSubmittedIssues(updatedIssues);
+      localStorage.setItem("submittedIssues", JSON.stringify(updatedIssues));
+      
       setIsSubmitting(false);
       
       toast({
         title: "Report Submitted Successfully",
-        description: "Your issue has been reported to the authorities.",
+        description: `Your complaint (ID: ${complaintId}) has been reported to the authorities.`,
         duration: 5000,
       });
       
@@ -205,131 +266,44 @@ const ReportIssue = () => {
   return (
     <div className="flex flex-col min-h-screen bg-muted/30 pb-16">
       <header className="p-4 bg-app-green text-white shadow-md">
-        <h1 className="text-xl font-bold">Report an Issue</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-bold">Report an Issue</h1>
+          <LanguageSelector />
+        </div>
         <p className="text-sm mt-1">Help us improve your village</p>
       </header>
 
       <main className="flex-1 p-4">
         <form onSubmit={handleSubmit} className="bg-white rounded-xl p-4 shadow-md">
-          <div className="mb-6">
-            <Label className="form-label">Issue Category</Label>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {issueCategories.map((category) => (
-                <Button
-                  key={category.id}
-                  type="button"
-                  variant={issueTopic === category.id ? "default" : "outline"}
-                  className={`h-auto py-2 px-3 justify-start text-sm ${
-                    issueTopic === category.id ? "bg-app-green text-white" : ""
-                  }`}
-                  onClick={() => setIssueTopic(category.id)}
-                >
-                  {category.label}
-                </Button>
-              ))}
-            </div>
-          </div>
+          <IssueCategories 
+            categories={issueCategories}
+            selectedCategory={issueTopic}
+            onSelectCategory={setIssueTopic}
+          />
 
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-1">
-              <Label className="form-label">Issue Description</Label>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className={`px-2 ${recording ? "text-red-500 animate-pulse" : "text-app-green"}`}
-                onClick={handleVoiceInput}
-              >
-                <Mic className="h-5 w-5 mr-1" />
-                {recording ? "Stop Recording" : "Voice Input"}
-              </Button>
-            </div>
-            <Textarea
-              placeholder="Describe your issue in detail..."
-              className="min-h-[120px] text-base"
-              value={issueDescription}
-              onChange={(e) => setIssueDescription(e.target.value)}
-            />
-          </div>
+          <IssueDescription
+            description={issueDescription}
+            onDescriptionChange={setIssueDescription}
+            onVoiceInput={handleVoiceInput}
+            isRecording={recording}
+          />
 
-          <div className="form-control">
-            <Label className="form-label">Urgency Level</Label>
-            <RadioGroup 
-              value={urgency} 
-              onValueChange={setUrgency} 
-              className="flex space-x-4 mt-1"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="normal" id="normal" />
-                <Label htmlFor="normal" className="text-sm text-gray-700">Normal</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="high" id="high" />
-                <Label htmlFor="high" className="text-sm text-amber-600">High</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="critical" id="critical" />
-                <Label htmlFor="critical" className="text-sm text-red-600">Critical</Label>
-              </div>
-            </RadioGroup>
-          </div>
+          <UrgencyLevel 
+            urgency={urgency}
+            onUrgencyChange={setUrgency}
+          />
 
-          <div className="form-control">
-            <Label className="form-label">Location</Label>
-            <div className="flex gap-2">
-              <Input 
-                placeholder="Enter location..."
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="flex-1"
-              />
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="icon"
-                onClick={getCurrentLocation}
-              >
-                <MapPin className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+          <LocationInput
+            location={location}
+            onLocationChange={setLocation}
+            onGetCurrentLocation={getCurrentLocation}
+          />
 
-          <div className="form-control">
-            <Label className="form-label">Add Photo Evidence (Optional)</Label>
-            <div className="mt-1">
-              {imagePreview ? (
-                <div className="relative rounded-md overflow-hidden h-48 bg-gray-100">
-                  <img 
-                    src={imagePreview} 
-                    alt="Preview" 
-                    className="w-full h-full object-cover"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={() => setImagePreview(null)}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ) : (
-                <label className="flex flex-col items-center justify-center w-full h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:bg-gray-100">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <ImagePlus className="w-8 h-8 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500">Click to upload an image</p>
-                  </div>
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                </label>
-              )}
-            </div>
-          </div>
+          <PhotoUpload
+            imagePreview={imagePreview}
+            onImageUpload={handleImageUpload}
+            onRemoveImage={() => setImagePreview(null)}
+          />
 
           <Button 
             type="submit" 

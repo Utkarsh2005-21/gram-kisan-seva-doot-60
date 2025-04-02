@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, FileText, Calendar, Settings, MessageCircle } from "lucide-react";
+import { Home, FileText, Calendar, Settings, MessageCircle, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -16,9 +16,9 @@ const NavigationBar = () => {
   const navigationItems = [
     { name: "Home", icon: Home, path: "/" },
     { name: "Report", icon: FileText, path: "/report" },
+    { name: "Track", icon: FileCheck, path: "/complaints" },
     { name: "Farming", icon: Calendar, path: "/farming" },
     { name: "Community", icon: MessageCircle, path: "/community" },
-    { name: "Settings", icon: Settings, path: "/settings" },
   ];
 
   return (
