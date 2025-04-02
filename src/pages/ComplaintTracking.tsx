@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from "react";
 import { 
   Calendar, Check, Clock, AlertTriangle, Share2, 
-  ChevronDown, ChevronUp, FileText, PenSquare
+  ChevronDown, ChevronUp, FileText, PenSquare, Mail,
+  Printer, RefreshCw
 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { 
   Card, CardContent, CardDescription, 
@@ -14,11 +15,35 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NavigationBar from "@/components/NavigationBar";
 import LanguageSelector from "@/components/LanguageSelector";
+import TrackingTimeline from "@/components/TrackingTimeline";
+import EmailPreview from "@/components/EmailPreview";
+import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const ComplaintTracking = () => {
   const { toast } = useToast();
+  const { translate } = useLanguage();
   const [submittedIssues, setSubmittedIssues] = useState<any[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [emailPreviewOpen, setEmailPreviewOpen] = useState(false);
+  const [selectedComplaint, setSelectedComplaint] = useState<any>(null);
   
   useEffect(() => {
     // Load submitted issues from localStorage
@@ -52,12 +77,12 @@ const ComplaintTracking = () => {
 
   const getStatusText = (status: string) => {
     switch(status) {
-      case "submitted": return "Submitted";
-      case "seen": return "Seen by Official";
-      case "in_progress": return "In Progress";
-      case "near_complete": return "Near Complete";
-      case "resolved": return "Resolved";
-      default: return "Unknown";
+      case "submitted": return translate("submitted");
+      case "seen": return translate("seen");
+      case "in_progress": return translate("in_progress");
+      case "near_complete": return translate("near_complete");
+      case "resolved": return translate("resolved");
+      default: return translate("unknown");
     }
   };
   
@@ -72,21 +97,21 @@ const ComplaintTracking = () => {
 
   const getCategoryLabel = (id: string) => {
     const categories: Record<string, string> = {
-      "roads": "Roads & Infrastructure",
-      "water": "Water Supply",
-      "electricity": "Electricity",
-      "education": "Education",
-      "healthcare": "Healthcare",
-      "violence": "Domestic Violence",
-      "other": "Other Issues"
+      "roads": translate("roads_infrastructure"),
+      "water": translate("water_supply"),
+      "electricity": translate("electricity"),
+      "education": translate("education"),
+      "healthcare": translate("healthcare"),
+      "violence": translate("domestic_violence"),
+      "other": translate("other_issues")
     };
     return categories[id] || id;
   };
 
   const handleEscalate = (complaintId: string) => {
     toast({
-      title: "Complaint Escalated",
-      description: "Your complaint has been escalated to a higher authority.",
+      title: translate("complaint_escalated"),
+      description: translate("complaint_escalated_desc"),
       duration: 3000,
     });
     
@@ -124,16 +149,16 @@ const ComplaintTracking = () => {
       })
       .then(() => {
         toast({
-          title: "Shared Successfully",
-          description: "Your complaint has been shared.",
+          title: translate("shared_successfully"),
+          description: translate("complaint_shared"),
           duration: 3000,
         });
       })
       .catch((error) => {
         console.error("Sharing failed:", error);
         toast({
-          title: "Sharing Failed",
-          description: "Could not share your complaint. Please try again.",
+          title: translate("sharing_failed"),
+          description: translate("sharing_failed_desc"),
           variant: "destructive",
           duration: 3000,
         });
@@ -141,8 +166,8 @@ const ComplaintTracking = () => {
     } else {
       // Fallback for browsers that don't support navigator.share
       toast({
-        title: "Share",
-        description: "Sharing is not supported in your browser. Please use the copy button to copy the link.",
+        title: translate("share"),
+        description: translate("sharing_not_supported"),
         duration: 3000,
       });
     }
@@ -150,10 +175,40 @@ const ComplaintTracking = () => {
 
   const handleGenerateRTI = (complaintId: string) => {
     toast({
-      title: "RTI Generated",
-      description: "An RTI application has been generated. You will receive it via email.",
+      title: translate("rti_generated"),
+      description: translate("rti_generated_desc"),
       duration: 3000,
     });
+  };
+
+  const handleOpenEmailPreview = (complaint: any) => {
+    setSelectedComplaint(complaint);
+    setEmailPreviewOpen(true);
+  };
+
+  const handleEmailSent = () => {
+    // Update the complaint with a new update about email being sent
+    if (selectedComplaint) {
+      const updatedIssues = submittedIssues.map(issue => {
+        if (issue.id === selectedComplaint.id) {
+          return {
+            ...issue,
+            updates: [
+              ...issue.updates,
+              {
+                status: "Email Sent",
+                date: new Date().toISOString(),
+                message: "You've sent an email to concerned authority regarding this complaint."
+              }
+            ]
+          };
+        }
+        return issue;
+      });
+      
+      setSubmittedIssues(updatedIssues);
+      localStorage.setItem("submittedIssues", JSON.stringify(updatedIssues));
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -174,17 +229,17 @@ const ComplaintTracking = () => {
     <div className="flex flex-col min-h-screen bg-muted/30 pb-16">
       <header className="p-4 bg-app-green text-white shadow-md">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">Track Your Complaints</h1>
+          <h1 className="text-xl font-bold">{translate("track_complaints")}</h1>
           <LanguageSelector />
         </div>
-        <p className="text-sm mt-1">Monitor and escalate your reported issues</p>
+        <p className="text-sm mt-1">{translate("track_complaints_desc")}</p>
       </header>
 
       <main className="flex-1 p-4">
         <Tabs defaultValue="active" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="active">Active ({activeComplaints.length})</TabsTrigger>
-            <TabsTrigger value="resolved">Resolved ({resolvedComplaints.length})</TabsTrigger>
+            <TabsTrigger value="active">{translate("active")} ({activeComplaints.length})</TabsTrigger>
+            <TabsTrigger value="resolved">{translate("resolved")} ({resolvedComplaints.length})</TabsTrigger>
           </TabsList>
           
           <TabsContent value="active" className="space-y-4">
@@ -192,8 +247,8 @@ const ComplaintTracking = () => {
               <Card>
                 <CardContent className="pt-6 text-center">
                   <FileText className="mx-auto h-12 w-12 text-gray-300 mb-2" />
-                  <p className="text-gray-500">No active complaints.</p>
-                  <p className="text-sm text-gray-400 mt-1">Issues you report will appear here.</p>
+                  <p className="text-gray-500">{translate("no_active_complaints")}</p>
+                  <p className="text-sm text-gray-400 mt-1">{translate("issues_will_appear")}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -223,16 +278,11 @@ const ComplaintTracking = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="mb-3">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className={getStatusColor(complaint.status)}>
-                          {getStatusText(complaint.status)}
-                        </span>
-                        <span className="text-gray-500">
-                          {getStatusProgress(complaint.status)}%
-                        </span>
-                      </div>
-                      <Progress value={getStatusProgress(complaint.status)} className="h-2" />
+                    <div className="mb-4">
+                      <TrackingTimeline 
+                        updates={complaint.updates} 
+                        status={complaint.status} 
+                      />
                     </div>
                     
                     <p className="text-sm text-gray-700 mb-2 line-clamp-2">
@@ -241,7 +291,7 @@ const ComplaintTracking = () => {
                     
                     {expandedId === complaint.id && (
                       <div className="mt-4 border-t pt-3">
-                        <h4 className="text-sm font-medium mb-2">Updates</h4>
+                        <h4 className="text-sm font-medium mb-2">{translate("updates")}</h4>
                         <div className="space-y-3">
                           {complaint.updates.map((update: any, index: number) => (
                             <div key={index} className="flex gap-3">
@@ -259,7 +309,49 @@ const ComplaintTracking = () => {
                           ))}
                         </div>
                         
-                        <h4 className="text-sm font-medium mt-4 mb-2">Next Steps</h4>
+                        <Drawer>
+                          <DrawerTrigger asChild>
+                            <Button variant="outline" size="sm" className="mt-3 w-full">
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              {translate("view_full_history")}
+                            </Button>
+                          </DrawerTrigger>
+                          <DrawerContent>
+                            <DrawerHeader>
+                              <DrawerTitle>{translate("complaint_history")}</DrawerTitle>
+                              <DrawerDescription>
+                                ID: {complaint.id} • {formatDate(complaint.dateSubmitted)}
+                              </DrawerDescription>
+                            </DrawerHeader>
+                            <div className="px-4">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>{translate("date")}</TableHead>
+                                    <TableHead>{translate("status")}</TableHead>
+                                    <TableHead>{translate("details")}</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {complaint.updates.map((update: any, index: number) => (
+                                    <TableRow key={index}>
+                                      <TableCell className="font-medium">{formatDate(update.date)}</TableCell>
+                                      <TableCell>{update.status}</TableCell>
+                                      <TableCell>{update.message}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                            <DrawerFooter>
+                              <DrawerClose asChild>
+                                <Button variant="outline">{translate("close")}</Button>
+                              </DrawerClose>
+                            </DrawerFooter>
+                          </DrawerContent>
+                        </Drawer>
+                        
+                        <h4 className="text-sm font-medium mt-4 mb-2">{translate("next_steps")}</h4>
                         <div className="flex flex-wrap gap-2">
                           <Button 
                             variant="outline" 
@@ -268,7 +360,7 @@ const ComplaintTracking = () => {
                             onClick={() => handleEscalate(complaint.id)}
                           >
                             <AlertTriangle className="h-4 w-4 mr-1" />
-                            Escalate
+                            {translate("escalate")}
                           </Button>
                           <Button 
                             variant="outline" 
@@ -277,7 +369,16 @@ const ComplaintTracking = () => {
                             onClick={() => handleShareOnSocial(complaint.id)}
                           >
                             <Share2 className="h-4 w-4 mr-1" />
-                            Share
+                            {translate("share")}
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-9"
+                            onClick={() => handleOpenEmailPreview(complaint)}
+                          >
+                            <Mail className="h-4 w-4 mr-1" />
+                            {translate("email")}
                           </Button>
                           <Button 
                             variant="outline" 
@@ -286,7 +387,16 @@ const ComplaintTracking = () => {
                             onClick={() => handleGenerateRTI(complaint.id)}
                           >
                             <PenSquare className="h-4 w-4 mr-1" />
-                            Generate RTI
+                            {translate("generate_rti")}
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-9"
+                            onClick={() => window.print()}
+                          >
+                            <Printer className="h-4 w-4 mr-1" />
+                            {translate("print")}
                           </Button>
                         </div>
                       </div>
@@ -300,7 +410,7 @@ const ComplaintTracking = () => {
                         className="text-app-green p-0 h-auto"
                         onClick={() => setExpandedId(complaint.id)}
                       >
-                        Show details
+                        {translate("show_details")}
                       </Button>
                     </CardFooter>
                   )}
@@ -314,8 +424,8 @@ const ComplaintTracking = () => {
               <Card>
                 <CardContent className="pt-6 text-center">
                   <Check className="mx-auto h-12 w-12 text-gray-300 mb-2" />
-                  <p className="text-gray-500">No resolved complaints.</p>
-                  <p className="text-sm text-gray-400 mt-1">Resolved issues will appear here.</p>
+                  <p className="text-gray-500">{translate("no_resolved_complaints")}</p>
+                  <p className="text-sm text-gray-400 mt-1">{translate("resolved_issues_will_appear")}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -332,7 +442,7 @@ const ComplaintTracking = () => {
                         </CardDescription>
                       </div>
                       <span className="text-white text-xs px-2 py-1 rounded-full bg-green-500">
-                        Resolved
+                        {translate("resolved")}
                       </span>
                     </div>
                   </CardHeader>
@@ -347,6 +457,17 @@ const ComplaintTracking = () => {
           </TabsContent>
         </Tabs>
       </main>
+
+      {selectedComplaint && (
+        <EmailPreview
+          complaintId={selectedComplaint.id}
+          complaintTopic={getCategoryLabel(selectedComplaint.topic)}
+          complaintDescription={selectedComplaint.description}
+          open={emailPreviewOpen}
+          onOpenChange={setEmailPreviewOpen}
+          onSend={handleEmailSent}
+        />
+      )}
 
       <NavigationBar />
     </div>
