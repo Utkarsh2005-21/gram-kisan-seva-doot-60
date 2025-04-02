@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { Mic, ImagePlus, MapPin, Check, AlertTriangle, FileText } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { Mic, ImagePlus, MapPin, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import NavigationBar from "@/components/NavigationBar";
+import { startSpeechRecognition } from "@/utils/speechRecognition";
 
 const ReportIssue = () => {
   const { toast } = useToast();
@@ -18,6 +19,7 @@ const ReportIssue = () => {
   const [location, setLocation] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const issueCategories = [
     { id: "roads", label: "Roads & Infrastructure" },
@@ -30,39 +32,83 @@ const ReportIssue = () => {
   ];
 
   const handleVoiceInput = () => {
+    if (recording) {
+      // Stop recording if already in progress
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+      return;
+    }
+
     setRecording(true);
     
-    // Simulating voice recording
     toast({
       title: "Voice Recording Started",
       description: "Please speak clearly...",
       duration: 3000,
     });
     
-    // Simulate a voice input result after 3 seconds
-    setTimeout(() => {
-      setRecording(false);
-      setIssueDescription(
-        "The village road connecting to the main highway has large potholes making it difficult for vehicles to pass, especially during the rainy season. This has been a problem for the last 3 months."
+    try {
+      recognitionRef.current = startSpeechRecognition(
+        // On result
+        (transcript) => {
+          setIssueDescription(transcript);
+          
+          // Try to determine issue topic from transcript
+          const lowerTranscript = transcript.toLowerCase();
+          let detectedTopic = "";
+          
+          if (lowerTranscript.includes("road") || lowerTranscript.includes("infrastructure") || lowerTranscript.includes("highway") || lowerTranscript.includes("street")) {
+            detectedTopic = "roads";
+          } else if (lowerTranscript.includes("water") || lowerTranscript.includes("tap") || lowerTranscript.includes("drinking")) {
+            detectedTopic = "water";
+          } else if (lowerTranscript.includes("electricity") || lowerTranscript.includes("power") || lowerTranscript.includes("outage")) {
+            detectedTopic = "electricity";
+          } else if (lowerTranscript.includes("school") || lowerTranscript.includes("education") || lowerTranscript.includes("teacher")) {
+            detectedTopic = "education";
+          } else if (lowerTranscript.includes("hospital") || lowerTranscript.includes("doctor") || lowerTranscript.includes("medical")) {
+            detectedTopic = "healthcare";
+          } else if (lowerTranscript.includes("violence") || lowerTranscript.includes("abuse") || lowerTranscript.includes("domestic")) {
+            detectedTopic = "violence";
+          }
+          
+          if (detectedTopic) {
+            setIssueTopic(detectedTopic);
+          }
+        },
+        // On end
+        () => {
+          setRecording(false);
+          recognitionRef.current = null;
+          
+          toast({
+            title: "Voice Recording Complete",
+            description: "Your description has been recorded. Please review and edit if needed.",
+            duration: 3000,
+          });
+        }
       );
-      setIssueTopic("roads");
       
+      if (!recognitionRef.current) {
+        // If speech recognition failed to initialize
+        setRecording(false);
+        toast({
+          title: "Voice Recording Failed",
+          description: "Your browser may not support speech recognition. Please type your issue instead.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    } catch (error) {
+      console.error("Error initializing speech recognition:", error);
+      setRecording(false);
       toast({
-        title: "Voice Recording Complete",
-        description: "Your description has been recorded. Please review and edit if needed.",
-        duration: 3000,
+        title: "Voice Recording Failed",
+        description: "There was an error starting the voice recognition. Please try again or type your issue.",
+        variant: "destructive",
+        duration: 5000,
       });
-    }, 3000);
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -156,7 +202,7 @@ const ReportIssue = () => {
                 onClick={handleVoiceInput}
               >
                 <Mic className="h-5 w-5 mr-1" />
-                {recording ? "Recording..." : "Voice Input"}
+                {recording ? "Stop Recording" : "Voice Input"}
               </Button>
             </div>
             <Textarea
