@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Check, Globe } from "lucide-react";
 import {
   Select,
@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface LanguageSelectorProps {
   onChange?: (language: string) => void;
@@ -16,21 +17,14 @@ interface LanguageSelectorProps {
 
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onChange }) => {
   const { toast } = useToast();
-  const [selectedLanguage, setSelectedLanguage] = useState(() => {
-    return localStorage.getItem("preferredLanguage") || "english";
-  });
-
-  // Update localStorage when language changes
-  useEffect(() => {
-    localStorage.setItem("preferredLanguage", selectedLanguage);
-  }, [selectedLanguage]);
+  const { language, setLanguage, translate } = useLanguage();
 
   const handleLanguageChange = (value: string) => {
-    setSelectedLanguage(value);
+    setLanguage(value as any);
     
     toast({
-      title: "Language Changed",
-      description: "Your language preference has been updated.",
+      title: translate("language_changed"),
+      description: translate("language_updated"),
       duration: 2000,
     });
     
@@ -52,11 +46,11 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onChange }) => {
 
   return (
     <div className="w-full max-w-[200px]">
-      <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+      <Select value={language} onValueChange={handleLanguageChange}>
         <SelectTrigger className="w-full bg-white/10 border-white/20 text-white">
           <div className="flex items-center">
             <Globe className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Select Language" />
+            <SelectValue placeholder={translate("settings")} />
           </div>
         </SelectTrigger>
         <SelectContent className="max-h-80">

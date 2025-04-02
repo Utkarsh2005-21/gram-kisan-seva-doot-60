@@ -8,10 +8,12 @@ import NavigationBar from "@/components/NavigationBar";
 import LanguageSelector from "@/components/LanguageSelector";
 import { startSpeechRecognition } from "@/utils/speechRecognition";
 import { isOnline } from "@/utils/offlineStorage";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { translate } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [networkStatus, setNetworkStatus] = useState(isOnline());
 
@@ -38,8 +40,8 @@ const Index = () => {
     setIsListening(true);
     
     toast({
-      title: "Voice Assistant Activated",
-      description: "Please speak your request...",
+      title: translate("voice_assistant"),
+      description: translate("speak_request"),
       duration: 3000,
     });
     
@@ -140,7 +142,7 @@ const Index = () => {
       <main className="flex-1 p-4">
         <section className="mb-8">
           <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-            <h2 className="text-lg font-semibold mb-4 text-app-earth-dark">Welcome!</h2>
+            <h2 className="text-lg font-semibold mb-4 text-app-earth-dark">{translate("welcome")}</h2>
             <p className="text-sm text-gray-600 mb-4">
               Report village issues or get farming assistance. How can we help you today?
             </p>
@@ -150,7 +152,7 @@ const Index = () => {
               onClick={() => navigate("/report")}
             >
               <FileText className="h-5 w-5" />
-              Report an Issue
+              {translate("report_issue")}
             </Button>
             
             <Button 
@@ -158,7 +160,7 @@ const Index = () => {
               onClick={() => navigate("/complaints")}
             >
               <FileCheck className="h-5 w-5" />
-              Track Your Complaints
+              {translate("track_complaints")}
             </Button>
             
             <Button 
@@ -166,7 +168,7 @@ const Index = () => {
               onClick={() => navigate("/farming")}
             >
               <Calendar className="h-5 w-5" />
-              Farming Assistance
+              {translate("farming_assistance")}
             </Button>
           </div>
         </section>
@@ -177,7 +179,7 @@ const Index = () => {
             onClick={() => navigate("/farming")}
           >
             <CloudRain className="h-8 w-8 text-app-earth mb-2" />
-            <h3 className="text-sm font-medium">Weather Alerts</h3>
+            <h3 className="text-sm font-medium">{translate("weather_alerts")}</h3>
           </div>
           
           <div 
@@ -185,7 +187,7 @@ const Index = () => {
             onClick={() => navigate("/community")}
           >
             <Headphones className="h-8 w-8 text-app-green mb-2" />
-            <h3 className="text-sm font-medium">Community Support</h3>
+            <h3 className="text-sm font-medium">{translate("community_support")}</h3>
           </div>
         </section>
 
@@ -206,7 +208,7 @@ const Index = () => {
           <div className="fixed top-16 inset-x-0 bg-amber-50 border-b border-amber-100 p-2 text-amber-800 text-sm text-center">
             <div className="flex items-center justify-center gap-2">
               <WifiOff className="h-4 w-4" />
-              <span>Offline Mode - Your actions will sync when you're back online</span>
+              <span>{translate("offline_mode")}</span>
             </div>
           </div>
         )}

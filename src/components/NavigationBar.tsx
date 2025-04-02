@@ -4,21 +4,23 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Home, FileText, Calendar, Settings, MessageCircle, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const NavigationBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { translate } = useLanguage();
   
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   const navigationItems = [
-    { name: "Home", icon: Home, path: "/" },
-    { name: "Report", icon: FileText, path: "/report" },
-    { name: "Track", icon: FileCheck, path: "/complaints" },
-    { name: "Farming", icon: Calendar, path: "/farming" },
-    { name: "Community", icon: MessageCircle, path: "/community" },
+    { name: translate("home"), icon: Home, path: "/" },
+    { name: translate("report"), icon: FileText, path: "/report" },
+    { name: translate("track"), icon: FileCheck, path: "/complaints" },
+    { name: translate("farming"), icon: Calendar, path: "/farming" },
+    { name: translate("community"), icon: MessageCircle, path: "/community" },
   ];
 
   return (

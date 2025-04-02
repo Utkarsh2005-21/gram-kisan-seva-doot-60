@@ -13,6 +13,7 @@ import Community from "./pages/Community";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { setupOfflineListeners } from "./utils/offlineStorage";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 const queryClient = new QueryClient();
 
@@ -24,21 +25,23 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/report" element={<ReportIssue />} />
-            <Route path="/complaints" element={<ComplaintTracking />} />
-            <Route path="/farming" element={<FarmingAssistance />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/report" element={<ReportIssue />} />
+              <Route path="/complaints" element={<ComplaintTracking />} />
+              <Route path="/farming" element={<FarmingAssistance />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 };
