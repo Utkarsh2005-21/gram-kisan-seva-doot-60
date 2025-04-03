@@ -8,7 +8,7 @@ interface LanguageContextProps {
 }
 
 const LanguageContext = createContext<LanguageContextProps>({
-  language: 'en',
+  language: 'english',
   setLanguage: () => {},
   translate: (key: string) => key,
 });
@@ -20,7 +20,7 @@ interface Translations {
 }
 
 const translations: Translations = {
-  en: {
+  english: {
     // Navigation
     home: "Home",
     report: "Report",
@@ -111,7 +111,7 @@ const translations: Translations = {
     domestic_violence: "Domestic Violence",
     other_issues: "Other Issues"
   },
-  hi: {
+  hindi: {
     // Navigation
     home: "होम",
     report: "रिपोर्ट",
@@ -201,18 +201,55 @@ const translations: Translations = {
     healthcare: "स्वास्थ्य सेवा",
     domestic_violence: "घरेलू हिंसा",
     other_issues: "अन्य मुद्दे"
+  },
+  tamil: {
+    // Basic translations for Tamil
+    home: "முகப்பு",
+    report: "புகார்",
+    track: "கண்காணிப்பு",
+    farming: "விவசாயம்",
+    community: "சமூகம்",
+    voice_assistant: "குரல் உதவியாளர்",
+    speak_request: "தெளிவாக பேசவும்...",
+    // ... more translations can be added later
+  },
+  telugu: {
+    // Basic translations for Telugu
+    home: "హోమ్",
+    report: "రిపోర్ట్",
+    track: "ట్రాక్",
+    farming: "వ్యవసాయం",
+    community: "సంఘం",
+    // ... more translations can be added later
+  },
+  bengali: {
+    // Basic translations for Bengali
+    home: "হোম",
+    report: "রিপোর্ট",
+    track: "ট্র্যাক",
+    farming: "কৃষি",
+    community: "সম্প্রদায়",
+    // ... more translations can be added later
   }
+  // Add other languages as needed
 };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'english');
 
   useEffect(() => {
     localStorage.setItem('language', language);
+    // Also set preferredLanguage for speech recognition
+    localStorage.setItem('preferredLanguage', language);
   }, [language]);
 
   const translate = (key: string): string => {
-    return translations[language]?.[key] || translations['en'][key] || key;
+    if (!translations[language]) {
+      console.warn(`Translation for language "${language}" not found, falling back to English`);
+      return translations['english'][key] || key;
+    }
+    
+    return translations[language][key] || translations['english'][key] || key;
   };
 
   return (

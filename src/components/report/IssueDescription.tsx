@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Mic } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -29,11 +29,20 @@ const IssueDescription: React.FC<IssueDescriptionProps> = ({
           type="button"
           size="sm"
           variant="ghost"
-          className={`px-2 ${isRecording ? "text-red-500 animate-pulse" : "text-app-green"}`}
+          className={`px-2 ${isRecording ? "text-red-500 bg-red-50 animate-pulse" : "text-app-green"}`}
           onClick={onVoiceInput}
         >
-          <Mic className="h-5 w-5 mr-1" />
-          {isRecording ? translate("close") : translate("voice_assistant")}
+          {isRecording ? (
+            <>
+              <MicOff className="h-5 w-5 mr-1" />
+              {translate("close")}
+            </>
+          ) : (
+            <>
+              <Mic className="h-5 w-5 mr-1" />
+              {translate("voice_assistant")}
+            </>
+          )}
         </Button>
       </div>
       <Textarea
@@ -43,7 +52,7 @@ const IssueDescription: React.FC<IssueDescriptionProps> = ({
         onChange={(e) => onDescriptionChange(e.target.value)}
       />
       {isRecording && (
-        <div className="mt-2 text-sm text-red-500 animate-pulse flex items-center justify-center">
+        <div className="mt-2 text-sm text-red-500 animate-pulse flex items-center justify-center p-2 bg-red-50 rounded-md">
           <Mic className="h-4 w-4 mr-1" />
           {translate("speak_request")}
         </div>

@@ -1,13 +1,22 @@
+
+// Define the WebkitSpeechRecognition type since TypeScript might not recognize it
+interface Window {
+  webkitSpeechRecognition: any;
+  SpeechRecognition: any;
+}
+
 const startSpeechRecognition = (onResult: (text: string) => void, onEnd: () => void) => {
   // Check if browser supports speech recognition
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+  // Properly handle both standard and webkit prefixed versions
+  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  
+  if (!SpeechRecognition) {
     console.error('Speech recognition not supported in this browser');
     onEnd();
     return null;
   }
 
   // Initialize speech recognition
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SpeechRecognition();
 
   // Configure the recognition
@@ -15,7 +24,7 @@ const startSpeechRecognition = (onResult: (text: string) => void, onEnd: () => v
   recognition.interimResults = true;
   
   // Try to detect language from the user's preferences
-  const storedLanguage = localStorage.getItem("preferredLanguage");
+  const storedLanguage = localStorage.getItem("language") || 'en';
   let langCode = 'en-US'; // Default to English
   
   // Map our app languages to speech recognition language codes
@@ -40,6 +49,9 @@ const startSpeechRecognition = (onResult: (text: string) => void, onEnd: () => v
       break;
     case 'punjabi':
       langCode = 'pa-IN';
+      break;
+    case 'english':
+      langCode = 'en-US';
       break;
     default:
       langCode = 'en-US';

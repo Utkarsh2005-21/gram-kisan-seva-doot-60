@@ -20,7 +20,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onChange }) => {
   const { language, setLanguage, translate } = useLanguage();
 
   const handleLanguageChange = (value: string) => {
-    setLanguage(value as any);
+    setLanguage(value);
     
     toast({
       title: translate("language_changed"),
@@ -54,9 +54,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onChange }) => {
           </div>
         </SelectTrigger>
         <SelectContent className="max-h-80">
-          {languages.map((language) => (
-            <SelectItem key={language.code} value={language.code}>
-              {language.name}
+          {languages.map((lang) => (
+            <SelectItem key={lang.code} value={lang.code}>
+              {lang.name}
             </SelectItem>
           ))}
         </SelectContent>
