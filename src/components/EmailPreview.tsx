@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Edit, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EmailPreviewProps {
   complaintId: string;
@@ -26,6 +27,7 @@ const EmailPreview: React.FC<EmailPreviewProps> = ({
   onSend,
 }) => {
   const { toast } = useToast();
+  const { translate } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [emailContent, setEmailContent] = useState(
     `Subject: Complaint Regarding ${complaintTopic} - Ref ID: ${complaintId}
@@ -51,8 +53,8 @@ Sincerely,
 
   const handleSend = () => {
     toast({
-      title: "Email Sent Successfully",
-      description: `Your email has been sent to ${recipient}`,
+      title: translate("email_sent"),
+      description: `${translate("email_sent_desc")} ${recipient}`,
       duration: 3000,
     });
     onSend();
@@ -65,13 +67,13 @@ Sincerely,
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Email Preview
+            {translate("email_preview")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 my-2">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">To:</p>
+            <p className="text-sm font-medium">{translate("to")}:</p>
             <p className="text-sm bg-muted p-2 rounded">{recipient}</p>
           </div>
 
@@ -95,11 +97,11 @@ Sincerely,
             className="flex items-center gap-1"
           >
             <Edit className="h-4 w-4" />
-            {isEditing ? "Preview" : "Edit Email"}
+            {isEditing ? translate("preview") : translate("edit_email")}
           </Button>
           <Button onClick={handleSend} className="flex items-center gap-1">
             <Send className="h-4 w-4" />
-            Send Email
+            {translate("send_email")}
           </Button>
         </DialogFooter>
       </DialogContent>

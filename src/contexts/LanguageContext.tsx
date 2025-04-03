@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface LanguageContextProps {
@@ -20,12 +21,14 @@ interface Translations {
 
 const translations: Translations = {
   en: {
+    // Navigation
     home: "Home",
     report: "Report",
     track: "Track",
     farming: "Farming",
     community: "Community",
     settings: "Settings",
+    
     // Common texts
     save: "Save",
     cancel: "Cancel",
@@ -38,21 +41,31 @@ const translations: Translations = {
     filter: "Filter",
     sort: "Sort",
     
+    // Home screen
+    welcome: "Welcome",
+    report_issue: "Report an Issue",
+    track_complaints: "Track Complaints",
+    farming_assistance: "Farming Assistance",
+    weather_alerts: "Weather Alerts",
+    community_support: "Community Support",
+    voice_assistant: "Voice Assistant",
+    speak_request: "Please speak your request clearly...",
+    offline_mode: "You're offline. Changes will sync when you're back online.",
+    
     // Complaint tracking specific
-    track_complaints: "Track Your Complaints",
     track_complaints_desc: "Monitor and escalate your reported issues",
-    active: "Active",
-    resolved: "Resolved",
+    active_complaints: "Active",
+    resolved_complaints: "Resolved",
     no_active_complaints: "No active complaints.",
     issues_will_appear: "Issues you report will appear here.",
     no_resolved_complaints: "No resolved complaints.",
     resolved_issues_will_appear: "Resolved issues will appear here.",
-    submitted: "Submitted",
-    seen: "Seen by Official",
-    in_progress: "In Progress",
-    near_complete: "Near Complete",
-    resolved: "Resolved",
-    unknown: "Unknown",
+    submitted_status: "Submitted",
+    seen_status: "Seen by Official",
+    in_progress_status: "In Progress",
+    near_complete_status: "Near Complete",
+    resolved_status: "Resolved",
+    unknown_status: "Unknown",
     updates: "Updates",
     view_full_history: "View Full History",
     complaint_history: "Complaint History",
@@ -68,6 +81,13 @@ const translations: Translations = {
     details: "Details",
     
     // Email related
+    email_preview: "Email Preview",
+    to: "To:",
+    preview: "Preview",
+    edit_email: "Edit Email",
+    send_email: "Send Email",
+    email_sent: "Email Sent Successfully",
+    email_sent_desc: "Your email has been sent to",
     complaint_escalated: "Complaint Escalated",
     complaint_escalated_desc: "Your complaint has been escalated to a higher authority.",
     shared_successfully: "Shared Successfully",
@@ -77,6 +97,10 @@ const translations: Translations = {
     sharing_not_supported: "Sharing is not supported in your browser. Please use the copy button to copy the link.",
     rti_generated: "RTI Generated",
     rti_generated_desc: "An RTI application has been generated. You will receive it via email.",
+    
+    // Language related
+    language_changed: "Language Changed",
+    language_updated: "Your language preference has been updated.",
     
     // Categories
     roads_infrastructure: "Roads & Infrastructure",
@@ -88,12 +112,14 @@ const translations: Translations = {
     other_issues: "Other Issues"
   },
   hi: {
+    // Navigation
     home: "होम",
     report: "रिपोर्ट",
     track: "ट्रैक",
     farming: "कृषि",
     community: "समुदाय",
     settings: "सेटिंग्स",
+    
     // Common texts
     save: "सहेजें",
     cancel: "रद्द करें",
@@ -106,21 +132,31 @@ const translations: Translations = {
     filter: "फ़िल्टर",
     sort: "क्रमबद्ध करें",
     
+    // Home screen
+    welcome: "स्वागत है",
+    report_issue: "समस्या की रिपोर्ट करें",
+    track_complaints: "शिकायतें ट्रैक करें",
+    farming_assistance: "कृषि सहायता",
+    weather_alerts: "मौसम अलर्ट",
+    community_support: "सामुदायिक सहायता",
+    voice_assistant: "वॉयस असिस्टेंट",
+    speak_request: "कृपया अपना अनुरोध स्पष्ट रूप से बोलें...",
+    offline_mode: "आप ऑफलाइन हैं। आपके ऑनलाइन होने पर परिवर्तन सिंक होंगे।",
+    
     // Complaint tracking specific
-    track_complaints: "अपनी शिकायतें ट्रैक करें",
     track_complaints_desc: "अपनी रिपोर्ट की गई समस्याओं की निगरानी करें और उन्हें बढ़ाएं",
-    active: "सक्रिय",
-    resolved: "हल किए गए",
+    active_complaints: "सक्रिय",
+    resolved_complaints: "हल किए गए",
     no_active_complaints: "कोई सक्रिय शिकायत नहीं।",
     issues_will_appear: "आपके द्वारा रिपोर्ट की गई समस्याएं यहां दिखाई देंगी।",
     no_resolved_complaints: "कोई हल की गई शिकायत नहीं।",
     resolved_issues_will_appear: "हल की गई समस्याएं यहां दिखाई देंगी।",
-    submitted: "जमा किया गया",
-    seen: "अधिकारी द्वारा देखा गया",
-    in_progress: "प्रगति पर है",
-    near_complete: "लगभग पूरा हुआ",
-    resolved: "हल किया गया",
-    unknown: "अज्ञात",
+    submitted_status: "जमा किया गया",
+    seen_status: "अधिकारी द्वारा देखा गया",
+    in_progress_status: "प्रगति पर है",
+    near_complete_status: "लगभग पूरा हुआ",
+    resolved_status: "हल किया गया",
+    unknown_status: "अज्ञात",
     updates: "अपडेट",
     view_full_history: "पूरा इतिहास देखें",
     complaint_history: "शिकायत इतिहास",
@@ -136,6 +172,13 @@ const translations: Translations = {
     details: "विवरण",
     
     // Email related
+    email_preview: "ईमेल प्रीव्यू",
+    to: "प्रति:",
+    preview: "प्रीव्यू",
+    edit_email: "ईमेल संपादित करें",
+    send_email: "ईमेल भेजें",
+    email_sent: "ईमेल सफलतापूर्वक भेजा गया",
+    email_sent_desc: "आपका ईमेल भेज दिया गया है",
     complaint_escalated: "शिकायत बढ़ाई गई",
     complaint_escalated_desc: "आपकी शिकायत उच्च अधिकारी को बढ़ा दी गई है।",
     shared_successfully: "सफलतापूर्वक साझा किया गया",
@@ -145,6 +188,10 @@ const translations: Translations = {
     sharing_not_supported: "आपके ब्राउज़र में शेयरिंग समर्थित नहीं है। कृपया लिंक को कॉपी करने के लिए कॉपी बटन का उपयोग करें।",
     rti_generated: "RTI जनरेट किया गया",
     rti_generated_desc: "एक RTI आवेदन जनरेट किया गया है। आपको इसे ईमेल के माध्यम से प्राप्त होगा।",
+    
+    // Language related
+    language_changed: "भाषा बदली गई",
+    language_updated: "आपकी भाषा प्राथमिकता अपडेट की गई है।",
     
     // Categories
     roads_infrastructure: "सड़कें और बुनियादी ढांचा",
