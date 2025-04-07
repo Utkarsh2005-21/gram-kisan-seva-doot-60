@@ -27,6 +27,7 @@ const translations: Translations = {
     farming: "Farming",
     community: "Community",
     settings: "Settings",
+    safety: "Safety",
     
     // Common texts
     save: "Save",
@@ -39,6 +40,15 @@ const translations: Translations = {
     search: "Search",
     filter: "Filter",
     sort: "Sort",
+    
+    // Login page
+    name: "Full Name",
+    enter_name: "Enter your name",
+    mobile_number: "Mobile Number",
+    enter_mobile_number: "Enter your mobile number",
+    get_started: "Get Started",
+    processing: "Processing...",
+    privacy_note: "Your information is stored locally on your device and used to provide personalized services.",
     
     // Home screen
     welcome: "Welcome",
@@ -128,11 +138,30 @@ const translations: Translations = {
     electricity: "Electricity",
     education: "Education",
     healthcare: "Healthcare",
-    domestic_violence: "Domestic Violence",
     other_issues: "Other Issues",
     
+    // Settings
+    profile: "Profile",
+    preferences: "Preferences",
+    account_settings: "Account Settings",
+    logout: "Logout",
+    confirm_logout: "Are you sure you want to logout?",
+    yes_logout: "Yes, Logout",
+    
     // Safety
-    quick_exit: "Quick exit"
+    quick_exit: "Quick exit",
+    safety_hub: "Personal Safety Hub",
+    confidential_assistance: "Confidential assistance & resources",
+    send_sos: "Send SOS Alert",
+    sos_sent: "SOS Alert Sent",
+    trusted_contacts: "Trusted Contacts",
+    add_trusted_contact: "Add Trusted Contact",
+    safety_resources: "Safety Resources",
+    local_support: "Local Support Organizations",
+    chat_support: "Chat Support",
+    resources: "Resources",
+    my_contacts: "My Contacts",
+    chat: "Chat"
   },
   hindi: {
     // Navigation
@@ -142,6 +171,7 @@ const translations: Translations = {
     farming: "कृषि",
     community: "समुदाय",
     settings: "सेटिंग्स",
+    safety: "सुरक्षा",
     
     // Common texts
     save: "सहेजें",
@@ -154,6 +184,15 @@ const translations: Translations = {
     search: "खोज",
     filter: "फ़िल्टर",
     sort: "क्रमबद्ध करें",
+    
+    // Login page
+    name: "पूरा नाम",
+    enter_name: "अपना नाम दर्ज करें",
+    mobile_number: "मोबाइल नंबर",
+    enter_mobile_number: "अपना मोबाइल नंबर दर्ज करें",
+    get_started: "शुरू करें",
+    processing: "प्रोसेसिंग...",
+    privacy_note: "आपकी जानकारी आपके डिवाइस पर स्थानीय रूप से संग्रहीत है और वैयक्तिकृत सेवाएं प्रदान करने के लिए उपयोग की जाती है।",
     
     // Location and Weather
     location: "स्थान",
@@ -221,11 +260,30 @@ const translations: Translations = {
     electricity: "बिजली",
     education: "शिक्षा",
     healthcare: "स्वास्थ्य सेवा",
-    domestic_violence: "घरेलू हिंसा",
     other_issues: "अन्य मुद्दे",
     
+    // Settings
+    profile: "प्रोफाइल",
+    preferences: "प्राथमिकताएँ",
+    account_settings: "खाता सेटिंग्स",
+    logout: "लॉगआउट",
+    confirm_logout: "क्या आप वाकई लॉगआउट करना चाहते हैं?",
+    yes_logout: "हां, लॉगआउट करें",
+    
     // Safety
-    quick_exit: "तुरंत बाहर निकलें"
+    quick_exit: "तुरंत बाहर निकलें",
+    safety_hub: "व्यक्तिगत सुरक्षा केंद्र",
+    confidential_assistance: "गोपनीय सहायता और संसाधन",
+    send_sos: "SOS अलर्ट भेजें",
+    sos_sent: "SOS अलर्ट भेज दिया गया",
+    trusted_contacts: "विश्वसनीय संपर्क",
+    add_trusted_contact: "विश्वसनीय संपर्क जोड़ें",
+    safety_resources: "सुरक्षा संसाधन",
+    local_support: "स्थानीय सहायता संगठन",
+    chat_support: "चैट सहायता",
+    resources: "संसाधन",
+    my_contacts: "मेरे संपर्क",
+    chat: "चैट"
   },
   tamil: {
     // Basic translations for Tamil

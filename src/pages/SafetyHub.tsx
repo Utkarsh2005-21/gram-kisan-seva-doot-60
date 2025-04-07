@@ -32,8 +32,8 @@ const SafetyHub = () => {
     const handlePopState = (event: PopStateEvent) => {
       window.history.pushState(null, document.title, window.location.href);
       toast({
-        title: "Safety Feature",
-        description: "Please use the back button or quick exit for safety",
+        title: translate("safety"),
+        description: translate("quick_exit"),
         duration: 3000,
       });
     };
@@ -44,7 +44,7 @@ const SafetyHub = () => {
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [toast]);
+  }, [toast, translate]);
 
   // Setup network status listener
   useEffect(() => {
@@ -78,9 +78,9 @@ const SafetyHub = () => {
             <div>
               <h1 className="text-xl font-bold flex items-center">
                 <Shield className="h-5 w-5 mr-2" />
-                Personal Safety Hub
+                {translate("safety_hub")}
               </h1>
-              <p className="text-sm mt-0.5 text-purple-100">Confidential assistance & resources</p>
+              <p className="text-sm mt-0.5 text-purple-100">{translate("confidential_assistance")}</p>
             </div>
           </div>
           <div>
@@ -103,9 +103,9 @@ const SafetyHub = () => {
         
         <Tabs defaultValue="resources" className="w-full mb-4">
           <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="resources">Resources</TabsTrigger>
-            <TabsTrigger value="contacts">My Contacts</TabsTrigger>
-            <TabsTrigger value="chat">Chat Support</TabsTrigger>
+            <TabsTrigger value="resources">{translate("resources")}</TabsTrigger>
+            <TabsTrigger value="contacts">{translate("my_contacts")}</TabsTrigger>
+            <TabsTrigger value="chat">{translate("chat")}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="resources">

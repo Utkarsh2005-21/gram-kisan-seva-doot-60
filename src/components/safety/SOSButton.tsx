@@ -20,7 +20,7 @@ const SOSButton = () => {
       disabled={isSosActive}
     >
       <AlertTriangle className="h-6 w-6 mr-2" />
-      {isSosActive ? "SOS Alert Sent" : "Send SOS Alert"}
+      {isSosActive ? translate("sos_sent") : translate("send_sos")}
     </Button>
   );
 };
