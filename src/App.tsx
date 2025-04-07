@@ -53,13 +53,14 @@ const App = () => {
               <BrowserRouter>
                 <QuickExit />
                 <Routes>
-                  <Route 
-                    path="/login" 
-                    element={isLoggedIn ? <Navigate to="/" /> : <Login />} 
-                  />
+                  {/* Root path redirects based on authentication status */}
                   <Route 
                     path="/" 
                     element={isLoggedIn ? <Index /> : <Navigate to="/login" />} 
+                  />
+                  <Route 
+                    path="/login" 
+                    element={isLoggedIn ? <Navigate to="/" /> : <Login />} 
                   />
                   <Route 
                     path="/report" 

@@ -44,9 +44,11 @@ const Login = () => {
       return;
     }
     
-    // Simulate login process with a shorter timeout for better user experience
+    // Simulate login process with a shorter timeout
     setTimeout(() => {
       try {
+        console.log("Logging in user:", formData.name);
+        
         // Save user data
         updateUserData({
           name: formData.name,
@@ -65,11 +67,9 @@ const Login = () => {
         // Reset loading state
         setIsLoading(false);
         
-        // Navigate to home page - add a small delay for the toast to be visible
-        setTimeout(() => {
-          console.log("Navigating to home page");
-          navigate("/", { replace: true });
-        }, 500);
+        // Navigate to home page immediately after login
+        console.log("Attempting navigation to home page");
+        navigate("/", { replace: true });
       } catch (error) {
         console.error("Login error:", error);
         setIsLoading(false);
@@ -79,7 +79,7 @@ const Login = () => {
           variant: "destructive",
         });
       }
-    }, 1000);
+    }, 800); // Reduced timeout for better responsiveness
   };
 
   return (
