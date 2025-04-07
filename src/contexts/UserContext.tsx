@@ -56,6 +56,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem("userData", JSON.stringify(updatedData));
       return updatedData;
     });
+    setIsLoggedIn(true);
   };
 
   const clearUserData = () => {

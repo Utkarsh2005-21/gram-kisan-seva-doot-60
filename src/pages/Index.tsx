@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mic, FileText, Calendar, CloudRain, Headphones, FileCheck, Wifi, WifiOff } from "lucide-react";
+import { Mic, FileText, Calendar, CloudRain, Headphones, FileCheck, Wifi, WifiOff, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import NavigationBar from "@/components/NavigationBar";
@@ -9,11 +9,13 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { startSpeechRecognition } from "@/utils/speechRecognition";
 import { isOnline } from "@/utils/offlineStorage";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useUser } from "@/contexts/UserContext";
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { translate } = useLanguage();
+  const { isLoggedIn } = useUser();
   const [isListening, setIsListening] = useState(false);
   const [networkStatus, setNetworkStatus] = useState(isOnline());
 
@@ -128,7 +130,18 @@ const Index = () => {
       <header className="p-4 bg-app-green text-white shadow-md">
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold">ग्राम किसान सेवा दूत</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {!isLoggedIn && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="bg-white text-app-green hover:bg-gray-100 border-none flex gap-1 items-center"
+                onClick={() => navigate("/login")}
+              >
+                <LogIn className="h-4 w-4" />
+                {translate("login")}
+              </Button>
+            )}
             {networkStatus ? 
               <Wifi className="h-4 w-4 text-white/80" /> :
               <WifiOff className="h-4 w-4 text-red-300" />
