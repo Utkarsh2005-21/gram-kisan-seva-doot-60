@@ -21,6 +21,7 @@ const NavigationBar = () => {
     { name: translate("track"), icon: FileCheck, path: "/complaints" },
     { name: translate("farming"), icon: Calendar, path: "/farming" },
     { name: translate("community"), icon: MessageCircle, path: "/community" },
+    { name: translate("settings"), icon: Settings, path: "/settings" },
   ];
 
   return (

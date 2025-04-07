@@ -72,16 +72,19 @@ const Settings = () => {
   return (
     <div className="flex flex-col min-h-screen bg-muted/30 pb-16">
       <header className="p-4 bg-gray-800 text-white shadow-md">
-        <div className="flex items-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-white hover:bg-gray-700 mr-2"
-            onClick={() => navigate("/")}
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-xl font-bold">{translate("settings")}</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-gray-700 mr-2"
+              onClick={() => navigate("/")}
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold">{translate("settings")}</h1>
+          </div>
+          <LanguageSelector />
         </div>
       </header>
 

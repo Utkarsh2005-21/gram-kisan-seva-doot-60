@@ -1,16 +1,21 @@
 
 import React, { useState, useEffect } from "react";
-import { CloudRain, Droplet, Thermometer, Wind, Calendar, AlertTriangle, BookOpen, HelpCircle } from "lucide-react";
+import { CloudRain, Droplet, Thermometer, Wind, Calendar, AlertTriangle, BookOpen, HelpCircle, Settings } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import NavigationBar from "@/components/NavigationBar";
+import LanguageSelector from "@/components/LanguageSelector";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { getStoredLocation, getCurrentLocation } from "@/utils/locationUtils";
 
 const FarmingAssistance = () => {
   const { toast } = useToast();
+  const { translate } = useLanguage();
   const [isLoading, setIsLoading] = useState(true);
+  const [location, setLocation] = useState("Your Location");
   const [weatherData, setWeatherData] = useState({
     temperature: 28,
     humidity: 65,
@@ -19,12 +24,47 @@ const FarmingAssistance = () => {
   });
 
   useEffect(() => {
-    // Simulate loading weather data
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
+    // Load stored location or fetch new one
+    const loadLocation = async () => {
+      setIsLoading(true);
+      
+      let locationData = getStoredLocation();
+      
+      if (!locationData) {
+        try {
+          locationData = await getCurrentLocation();
+        } catch (error) {
+          console.error("Failed to get current location:", error);
+        }
+      }
+      
+      if (locationData) {
+        setLocation(locationData.address);
+        
+        // Simulate loading weather data based on location
+        // In a real app, we would fetch real weather data for the coordinates
+        setTimeout(() => {
+          // Generate somewhat random weather data based on the location string to simulate different weather
+          const hash = locationData.address.split("").reduce((acc, char) => {
+            return acc + char.charCodeAt(0);
+          }, 0);
+          
+          setWeatherData({
+            temperature: 22 + (hash % 15), // Temperature between 22-37°C
+            humidity: 40 + (hash % 50), // Humidity between 40-90%
+            rainfall: (hash % 10 > 7) ? (hash % 20) / 10 : 0, // Some chance of rainfall
+            windSpeed: 5 + (hash % 15), // Wind speed between 5-20 km/h
+          });
+          
+          setIsLoading(false);
+        }, 1500);
+      } else {
+        // Fallback to default data
+        setIsLoading(false);
+      }
+    };
+    
+    loadLocation();
   }, []);
 
   const weatherAlerts = [
@@ -84,11 +124,28 @@ const FarmingAssistance = () => {
   return (
     <div className="flex flex-col min-h-screen bg-muted/30 pb-16">
       <header className="p-4 bg-app-blue text-white shadow-md">
-        <h1 className="text-xl font-bold">Farming Assistance</h1>
-        <p className="text-sm mt-1">Weather, crops, and government schemes</p>
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-bold">{translate("farming_assistance")}</h1>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/20"
+              onClick={() => window.location.href = '/settings'}
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+            <LanguageSelector />
+          </div>
+        </div>
+        <p className="text-sm mt-1">{translate("weather_crops_schemes")}</p>
       </header>
 
       <main className="flex-1 p-4">
+        <div className="mb-4">
+          <h2 className="text-lg font-medium mb-1">{translate("location")}: {location}</h2>
+        </div>
+        
         <Tabs defaultValue="weather" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="weather">Weather</TabsTrigger>
@@ -101,15 +158,15 @@ const FarmingAssistance = () => {
               <Card className="w-full h-40 flex items-center justify-center">
                 <div className="flex flex-col items-center">
                   <div className="h-8 w-8 border-4 border-t-app-blue rounded-full animate-spin mb-2"></div>
-                  <p className="text-sm text-gray-500">Loading weather data...</p>
+                  <p className="text-sm text-gray-500">{translate("loading_weather")}</p>
                 </div>
               </Card>
             ) : (
               <>
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Current Weather</CardTitle>
-                    <CardDescription>Updated 30 minutes ago</CardDescription>
+                    <CardTitle className="text-lg">{translate("current_weather")}</CardTitle>
+                    <CardDescription>{translate("updated_recently")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">

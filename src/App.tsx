@@ -13,6 +13,7 @@ import Community from "./pages/Community";
 import Settings from "./pages/Settings";
 import SafetyHub from "./pages/SafetyHub";
 import NotFound from "./pages/NotFound";
+import QuickExit from "./components/safety/QuickExit";
 import { setupOfflineListeners } from "./utils/offlineStorage";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { SafetyProvider } from "./contexts/SafetyContext";
@@ -33,6 +34,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <QuickExit />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/report" element={<ReportIssue />} />

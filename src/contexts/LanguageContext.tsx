@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface LanguageContextProps {
@@ -80,6 +79,27 @@ const translations: Translations = {
     status: "Status",
     details: "Details",
     
+    // Location and Weather
+    location: "Location",
+    getting_location: "Getting Location",
+    accessing_location: "Accessing your current location...",
+    location_found: "Location Found",
+    location_detected: "Your location has been detected.",
+    location_error: "Location Error",
+    location_manual_entry: "Could not access your location. Please enter it manually.",
+    location_fallback: "Location Set",
+    location_entered_manually: "A location has been set for you.",
+    enter_location: "Enter location...",
+    current_weather: "Current Weather",
+    updated_recently: "Updated 30 minutes ago",
+    loading_weather: "Loading weather data...",
+    weather_crops_schemes: "Weather, crops, and government schemes",
+    
+    // Reports
+    submitting: "Submitting...",
+    submit_report: "Submit Report",
+    help_improve_village: "Help us improve your village",
+    
     // Email related
     email_preview: "Email Preview",
     to: "To:",
@@ -109,7 +129,10 @@ const translations: Translations = {
     education: "Education",
     healthcare: "Healthcare",
     domestic_violence: "Domestic Violence",
-    other_issues: "Other Issues"
+    other_issues: "Other Issues",
+    
+    // Safety
+    quick_exit: "Quick exit"
   },
   hindi: {
     // Navigation
@@ -131,6 +154,27 @@ const translations: Translations = {
     search: "खोज",
     filter: "फ़िल्टर",
     sort: "क्रमबद्ध करें",
+    
+    // Location and Weather
+    location: "स्थान",
+    getting_location: "स्थान प्राप्त कर रहे हैं",
+    accessing_location: "आपके वर्तमान स्थान तक पहुंच रहे हैं...",
+    location_found: "स्थान मिल गया",
+    location_detected: "आपका स्थान पता चल गया है।",
+    location_error: "स्थान त्रुटि",
+    location_manual_entry: "आपके स्थान तक पहुंच नहीं सकते। कृपया मैन्युअल रूप से दर्ज करें।",
+    location_fallback: "स्थान सेट किया गया",
+    location_entered_manually: "आपके लिए एक स्थान सेट किया गया है।",
+    enter_location: "स्थान दर्ज करें...",
+    current_weather: "वर्तमान मौसम",
+    updated_recently: "30 मिनट पहले अपडेट किया गया",
+    loading_weather: "मौसम डेटा लोड हो रहा है...",
+    weather_crops_schemes: "मौसम, फसलें और सरकारी योजनाएं",
+    
+    // Reports
+    submitting: "जमा किया जा रहा है...",
+    submit_report: "रिपोर्ट जमा करें",
+    help_improve_village: "अपने गांव को बेहतर बनाने में मदद करें",
     
     // Home screen
     welcome: "स्वागत है",
@@ -171,28 +215,6 @@ const translations: Translations = {
     status: "स्थिति",
     details: "विवरण",
     
-    // Email related
-    email_preview: "ईमेल प्रीव्यू",
-    to: "प्रति:",
-    preview: "प्रीव्यू",
-    edit_email: "ईमेल संपादित करें",
-    send_email: "ईमेल भेजें",
-    email_sent: "ईमेल सफलतापूर्वक भेजा गया",
-    email_sent_desc: "आपका ईमेल भेज दिया गया है",
-    complaint_escalated: "शिकायत बढ़ाई गई",
-    complaint_escalated_desc: "आपकी शिकायत उच्च अधिकारी को बढ़ा दी गई है।",
-    shared_successfully: "सफलतापूर्वक साझा किया गया",
-    complaint_shared: "आपकी शिकायत साझा की गई है।",
-    sharing_failed: "साझा करना विफल",
-    sharing_failed_desc: "आपकी शिकायत साझा नहीं की जा सकी। कृपया पुनः प्रयास करें।",
-    sharing_not_supported: "आपके ब्राउज़र में शेयरिंग समर्थित नहीं है। कृपया लिंक को कॉपी करने के लिए कॉपी बटन का उपयोग करें।",
-    rti_generated: "RTI जनरेट किया गया",
-    rti_generated_desc: "एक RTI आवेदन जनरेट किया गया है। आपको इसे ईमेल के माध्यम से प्राप्त होगा।",
-    
-    // Language related
-    language_changed: "भाषा बदली गई",
-    language_updated: "आपकी भाषा प्राथमिकता अपडेट की गई है।",
-    
     // Categories
     roads_infrastructure: "सड़कें और बुनियादी ढांचा",
     water_supply: "जल आपूर्ति",
@@ -200,7 +222,10 @@ const translations: Translations = {
     education: "शिक्षा",
     healthcare: "स्वास्थ्य सेवा",
     domestic_violence: "घरेलू हिंसा",
-    other_issues: "अन्य मुद्दे"
+    other_issues: "अन्य मुद्दे",
+    
+    // Safety
+    quick_exit: "तुरंत बाहर निकलें"
   },
   tamil: {
     // Basic translations for Tamil

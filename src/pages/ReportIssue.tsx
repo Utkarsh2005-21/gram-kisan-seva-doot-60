@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from "react";
-import { FileText } from "lucide-react";
+import { FileText, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import NavigationBar from "@/components/NavigationBar";
@@ -34,7 +33,6 @@ const ReportIssue = () => {
     { id: "other", label: "Other Issues" },
   ];
 
-  // Load submitted issues from localStorage on component mount
   useEffect(() => {
     const savedIssues = localStorage.getItem("submittedIssues");
     if (savedIssues) {
@@ -46,7 +44,6 @@ const ReportIssue = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check if file is an image
     if (!file.type.startsWith('image/')) {
       toast({
         title: "Invalid File",
@@ -56,8 +53,7 @@ const ReportIssue = () => {
       return;
     }
 
-    // Check file size (limit to 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       toast({
         title: "File Too Large",
@@ -67,7 +63,6 @@ const ReportIssue = () => {
       return;
     }
 
-    // Create file preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setImagePreview(e.target?.result as string);
@@ -83,7 +78,6 @@ const ReportIssue = () => {
 
   const handleVoiceInput = () => {
     if (recording) {
-      // Stop recording if already in progress
       if (recognitionRef.current) {
         recognitionRef.current.stop();
         recognitionRef.current = null;
@@ -101,11 +95,9 @@ const ReportIssue = () => {
     
     try {
       recognitionRef.current = startSpeechRecognition(
-        // On result
         (transcript) => {
           setIssueDescription(transcript);
           
-          // Try to determine issue topic from transcript
           const lowerTranscript = transcript.toLowerCase();
           let detectedTopic = "";
           
@@ -127,7 +119,6 @@ const ReportIssue = () => {
             setIssueTopic(detectedTopic);
           }
         },
-        // On end
         () => {
           setRecording(false);
           recognitionRef.current = null;
@@ -141,7 +132,6 @@ const ReportIssue = () => {
       );
       
       if (!recognitionRef.current) {
-        // If speech recognition failed to initialize
         setRecording(false);
         toast({
           title: "Voice Recording Failed",
@@ -172,8 +162,6 @@ const ReportIssue = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          // In a real app, we would use these coordinates to get a physical address
-          // For this demo, we'll simulate getting a location
           setLocation("Current Location: Village Rampur, District Sitapur");
           toast({
             title: "Location Found",
@@ -192,7 +180,6 @@ const ReportIssue = () => {
         }
       );
     } else {
-      // Fallback for browsers that don't support geolocation
       setLocation("Current Location: Village Rampur, District Sitapur");
       toast({
         title: "Location Found",
@@ -216,10 +203,8 @@ const ReportIssue = () => {
     
     setIsSubmitting(true);
     
-    // Generate a unique ID for the complaint
     const complaintId = `COMP-${Date.now().toString().slice(-6)}`;
     
-    // Create complaint object
     const newComplaint = {
       id: complaintId,
       topic: issueTopic,
@@ -229,7 +214,7 @@ const ReportIssue = () => {
       imageUrl: imagePreview,
       status: "submitted",
       dateSubmitted: new Date().toISOString(),
-      nextEscalation: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
+      nextEscalation: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
       updates: [
         {
           status: "Submitted",
@@ -239,9 +224,7 @@ const ReportIssue = () => {
       ]
     };
     
-    // Wait 2 seconds to simulate API submission
     setTimeout(() => {
-      // Add to complaints list and save to localStorage
       const updatedIssues = [...submittedIssues, newComplaint];
       setSubmittedIssues(updatedIssues);
       localStorage.setItem("submittedIssues", JSON.stringify(updatedIssues));
@@ -254,7 +237,6 @@ const ReportIssue = () => {
         duration: 5000,
       });
       
-      // Reset form
       setIssueDescription("");
       setIssueTopic("");
       setUrgency("normal");
