@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
@@ -44,42 +45,41 @@ const Login = () => {
       return;
     }
     
-    // Simulate login process with a shorter timeout
-    setTimeout(() => {
-      try {
-        console.log("Logging in user:", formData.name);
-        
-        // Save user data
-        updateUserData({
-          name: formData.name,
-          mobileNumber: formData.mobileNumber,
-          location: "",
-          language: "english"
-        });
-        
-        // Show success message
-        toast({
-          title: "Login Successful",
-          description: `Welcome, ${formData.name}!`,
-          duration: 2000,
-        });
-        
-        // Reset loading state
-        setIsLoading(false);
-        
-        // Navigate to home page immediately after login
-        console.log("Attempting navigation to home page");
+    try {
+      console.log("Logging in user:", formData.name);
+      
+      // Save user data
+      updateUserData({
+        name: formData.name,
+        mobileNumber: formData.mobileNumber,
+        location: "",
+        language: "english"
+      });
+      
+      // Show success message
+      toast({
+        title: "Login Successful",
+        description: `Welcome, ${formData.name}!`,
+        duration: 2000,
+      });
+      
+      // Use a small timeout to ensure the user data is saved and ready
+      setTimeout(() => {
+        // Force navigation to home page
+        console.log("Navigating to home page");
         navigate("/", { replace: true });
-      } catch (error) {
-        console.error("Login error:", error);
-        setIsLoading(false);
-        toast({
-          title: "Login Failed",
-          description: "An error occurred during login. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }, 800); // Reduced timeout for better responsiveness
+      }, 300);
+      
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login Failed",
+        description: "An error occurred during login. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

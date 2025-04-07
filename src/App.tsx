@@ -53,38 +53,38 @@ const App = () => {
               <BrowserRouter>
                 <QuickExit />
                 <Routes>
-                  {/* Root path redirects based on authentication status */}
+                  {/* Always start with login page if not logged in */}
                   <Route 
                     path="/" 
-                    element={isLoggedIn ? <Index /> : <Navigate to="/login" />} 
+                    element={isLoggedIn ? <Index /> : <Navigate to="/login" replace />} 
                   />
                   <Route 
                     path="/login" 
-                    element={isLoggedIn ? <Navigate to="/" /> : <Login />} 
+                    element={isLoggedIn ? <Navigate to="/" replace /> : <Login />} 
                   />
                   <Route 
                     path="/report" 
-                    element={isLoggedIn ? <ReportIssue /> : <Navigate to="/login" />} 
+                    element={isLoggedIn ? <ReportIssue /> : <Navigate to="/login" replace />} 
                   />
                   <Route 
                     path="/complaints" 
-                    element={isLoggedIn ? <ComplaintTracking /> : <Navigate to="/login" />} 
+                    element={isLoggedIn ? <ComplaintTracking /> : <Navigate to="/login" replace />} 
                   />
                   <Route 
                     path="/farming" 
-                    element={isLoggedIn ? <FarmingAssistance /> : <Navigate to="/login" />} 
+                    element={isLoggedIn ? <FarmingAssistance /> : <Navigate to="/login" replace />} 
                   />
                   <Route 
                     path="/community" 
-                    element={isLoggedIn ? <Community /> : <Navigate to="/login" />} 
+                    element={isLoggedIn ? <Community /> : <Navigate to="/login" replace />} 
                   />
                   <Route 
                     path="/settings" 
-                    element={isLoggedIn ? <Settings /> : <Navigate to="/login" />} 
+                    element={isLoggedIn ? <Settings /> : <Navigate to="/login" replace />} 
                   />
                   <Route 
                     path="/safety" 
-                    element={isLoggedIn ? <SafetyHub /> : <Navigate to="/login" />} 
+                    element={isLoggedIn ? <SafetyHub /> : <Navigate to="/login" replace />} 
                   />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
