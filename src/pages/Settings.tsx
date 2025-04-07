@@ -1,230 +1,199 @@
 
 import React, { useState } from "react";
-import { Bell, Globe, HelpCircle, Phone, Shield, User, FileText, Moon, Smartphone } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { 
+  ChevronRight, 
+  Globe, 
+  Bell, 
+  Moon, 
+  Shield, 
+  Smartphone, 
+  HelpCircle, 
+  LogOut, 
+  Info, 
+  ArrowLeft,
+  Fingerprint 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/components/ui/use-toast";
-import NavigationBar from "@/components/NavigationBar";
 import LanguageSelector from "@/components/LanguageSelector";
+import NavigationBar from "@/components/NavigationBar";
+import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Settings = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const [notifications, setNotifications] = useState({
-    grievances: true,
-    weather: true,
-    farming: true,
-    community: false,
-  });
-  
-  const [darkMode, setDarkMode] = useState(false);
-  const [offlineMode, setOfflineMode] = useState(false);
-  
-  const handleSaveSettings = () => {
+  const { translate } = useLanguage();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [safetyEntryTapCount, setSafetyEntryTapCount] = useState(0);
+
+  const handleLanguageChange = (language: string) => {
     toast({
-      title: "Settings Saved",
-      description: "Your preferences have been updated successfully.",
+      title: translate("language_changed"),
+      description: translate("language_updated"),
+      duration: 2000,
+    });
+  };
+
+  const handleBiometricToggle = () => {
+    setBiometricEnabled(!biometricEnabled);
+    toast({
+      title: !biometricEnabled ? "Biometric Authentication Enabled" : "Biometric Authentication Disabled",
+      description: !biometricEnabled 
+        ? "You'll now be prompted for fingerprint or face ID when opening the app." 
+        : "Standard PIN or pattern will be used for authentication.",
+      duration: 3000,
+    });
+  };
+
+  const handleAboutClick = () => {
+    // Secret entry to safety hub
+    setSafetyEntryTapCount(prevCount => {
+      const newCount = prevCount + 1;
+      if (newCount === 3) {
+        navigate("/safety");
+        return 0;
+      }
+      return newCount;
     });
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/30 pb-16">
       <header className="p-4 bg-gray-800 text-white shadow-md">
-        <h1 className="text-xl font-bold">Settings</h1>
-        <p className="text-sm mt-1">Manage your preferences</p>
+        <div className="flex items-center">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-white hover:bg-gray-700 mr-2"
+            onClick={() => navigate("/")}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-xl font-bold">{translate("settings")}</h1>
+        </div>
       </header>
 
       <main className="flex-1 p-4">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-medium">Account Settings</h2>
-          </div>
+        <section className="mb-6">
+          <h2 className="text-lg font-semibold mb-3">App Preferences</h2>
           
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <User className="h-5 w-5 text-gray-500 mr-3" />
-              <div>
-                <p className="font-medium">Profile Information</p>
-                <p className="text-sm text-gray-500">Manage your personal details</p>
+          <Card className="mb-4">
+            <CardContent className="p-0">
+              <div className="divide-y">
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center">
+                    <Globe className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="font-medium">Language</p>
+                      <p className="text-xs text-gray-500">Choose your preferred language</p>
+                    </div>
+                  </div>
+                  <LanguageSelector onChange={handleLanguageChange} />
+                </div>
+                
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center">
+                    <Bell className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="font-medium">Notifications</p>
+                      <p className="text-xs text-gray-500">Receive updates and alerts</p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={notificationsEnabled} 
+                    onCheckedChange={setNotificationsEnabled} 
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center">
+                    <Moon className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="font-medium">Dark Mode</p>
+                      <p className="text-xs text-gray-500">Toggle dark theme</p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={darkModeEnabled} 
+                    onCheckedChange={setDarkModeEnabled}
+                  />
+                </div>
               </div>
-            </div>
-            <Button variant="ghost" size="sm">
-              Edit
-            </Button>
-          </div>
+            </CardContent>
+          </Card>
           
-          <Separator />
+          <h2 className="text-lg font-semibold mb-3">Security</h2>
           
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <Phone className="h-5 w-5 text-gray-500 mr-3" />
-              <div>
-                <p className="font-medium">Contact Information</p>
-                <p className="text-sm text-gray-500">Update your phone number and address</p>
+          <Card className="mb-4">
+            <CardContent className="p-0">
+              <div className="divide-y">
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center">
+                    <Fingerprint className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="font-medium">Biometric Authentication</p>
+                      <p className="text-xs text-gray-500">Use fingerprint or face ID</p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={biometricEnabled} 
+                    onCheckedChange={handleBiometricToggle} 
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between p-4" onClick={handleAboutClick}>
+                  <div className="flex items-center">
+                    <Info className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="font-medium">About</p>
+                      <p className="text-xs text-gray-500">App information and version</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-gray-400" />
+                </div>
               </div>
-            </div>
-            <Button variant="ghost" size="sm">
-              Edit
-            </Button>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-medium">App Settings</h2>
-          </div>
+            </CardContent>
+          </Card>
           
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <Globe className="h-5 w-5 text-gray-500 mr-3" />
-              <div>
-                <p className="font-medium">Language Preference</p>
-                <p className="text-sm text-gray-500">Change the app language</p>
+          <h2 className="text-lg font-semibold mb-3">Support</h2>
+          
+          <Card className="mb-4">
+            <CardContent className="p-0">
+              <div className="divide-y">
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center">
+                    <HelpCircle className="h-5 w-5 text-gray-500 mr-3" />
+                    <div>
+                      <p className="font-medium">Help Center</p>
+                      <p className="text-xs text-gray-500">FAQs and user guides</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-gray-400" />
+                </div>
               </div>
-            </div>
-            <div className="w-[180px]">
-              <LanguageSelector />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
           
-          <Separator />
-          
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <Moon className="h-5 w-5 text-gray-500 mr-3" />
-              <div>
-                <p className="font-medium">Dark Mode</p>
-                <p className="text-sm text-gray-500">Use dark theme for night use</p>
-              </div>
-            </div>
-            <Switch
-              checked={darkMode}
-              onCheckedChange={setDarkMode}
-            />
-          </div>
-          
-          <Separator />
-          
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <Smartphone className="h-5 w-5 text-gray-500 mr-3" />
-              <div>
-                <p className="font-medium">Offline Mode</p>
-                <p className="text-sm text-gray-500">Save data for offline access</p>
-              </div>
-            </div>
-            <Switch
-              checked={offlineMode}
-              onCheckedChange={setOfflineMode}
-            />
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-medium">Notification Settings</h2>
-          </div>
-          
-          <div className="p-4 flex items-center justify-between">
-            <div>
-              <p className="font-medium">Grievance Updates</p>
-              <p className="text-sm text-gray-500">Updates on your reported issues</p>
-            </div>
-            <Switch
-              checked={notifications.grievances}
-              onCheckedChange={(checked) => 
-                setNotifications({...notifications, grievances: checked})
-              }
-            />
-          </div>
-          
-          <Separator />
-          
-          <div className="p-4 flex items-center justify-between">
-            <div>
-              <p className="font-medium">Weather Alerts</p>
-              <p className="text-sm text-gray-500">Important weather changes</p>
-            </div>
-            <Switch
-              checked={notifications.weather}
-              onCheckedChange={(checked) => 
-                setNotifications({...notifications, weather: checked})
-              }
-            />
-          </div>
-          
-          <Separator />
-          
-          <div className="p-4 flex items-center justify-between">
-            <div>
-              <p className="font-medium">Farming Advice</p>
-              <p className="text-sm text-gray-500">Farming tips and alerts</p>
-            </div>
-            <Switch
-              checked={notifications.farming}
-              onCheckedChange={(checked) => 
-                setNotifications({...notifications, farming: checked})
-              }
-            />
-          </div>
-          
-          <Separator />
-          
-          <div className="p-4 flex items-center justify-between">
-            <div>
-              <p className="font-medium">Community Activity</p>
-              <p className="text-sm text-gray-500">Replies to your questions</p>
-            </div>
-            <Switch
-              checked={notifications.community}
-              onCheckedChange={(checked) => 
-                setNotifications({...notifications, community: checked})
-              }
-            />
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-4">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-medium">Help & Support</h2>
-          </div>
-          
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <HelpCircle className="h-5 w-5 text-gray-500 mr-3" />
-              <p className="font-medium">Help Center</p>
-            </div>
-            <Button variant="ghost" size="sm">Open</Button>
-          </div>
-          
-          <Separator />
-          
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <FileText className="h-5 w-5 text-gray-500 mr-3" />
-              <p className="font-medium">Terms & Policies</p>
-            </div>
-            <Button variant="ghost" size="sm">View</Button>
-          </div>
-          
-          <Separator />
-          
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <Shield className="h-5 w-5 text-gray-500 mr-3" />
-              <p className="font-medium">Privacy Settings</p>
-            </div>
-            <Button variant="ghost" size="sm">Manage</Button>
-          </div>
-        </div>
-        
-        <Button 
-          className="w-full mt-4 mb-8 bg-app-green hover:bg-app-green-dark h-12"
-          onClick={handleSaveSettings}
-        >
-          Save All Settings
-        </Button>
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-center gap-2 text-destructive h-10"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Log Out</span>
+          </Button>
+        </section>
       </main>
 
       <NavigationBar />

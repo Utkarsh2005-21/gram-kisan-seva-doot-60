@@ -1,116 +1,111 @@
 
-// Define the WebkitSpeechRecognition type since TypeScript might not recognize it
-interface Window {
-  webkitSpeechRecognition: any;
-  SpeechRecognition: any;
-}
+import { toast } from "@/hooks/use-toast";
 
-const startSpeechRecognition = (onResult: (text: string) => void, onEnd: () => void) => {
+// This function starts the speech recognition
+export function startSpeechRecognition(
+  onResult: (transcript: string) => void,
+  onEnd: () => void
+) {
   // Check if browser supports speech recognition
-  // Properly handle both standard and webkit prefixed versions
-  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   
   if (!SpeechRecognition) {
-    console.error('Speech recognition not supported in this browser');
-    onEnd();
+    toast({
+      title: "Not Supported",
+      description: "Speech recognition is not supported in your browser.",
+      variant: "destructive",
+    });
     return null;
   }
-
-  // Initialize speech recognition
-  const recognition = new SpeechRecognition();
-
-  // Configure the recognition
-  recognition.continuous = true;  // Allow for longer recordings
-  recognition.interimResults = true;
   
-  // Try to detect language from the user's preferences
-  const storedLanguage = localStorage.getItem("language") || 'en';
-  let langCode = 'en-US'; // Default to English
-  
-  // Map our app languages to speech recognition language codes
-  switch (storedLanguage) {
-    case 'hindi':
-      langCode = 'hi-IN';
-      break;
-    case 'tamil':
-      langCode = 'ta-IN';
-      break;
-    case 'telugu':
-      langCode = 'te-IN';
-      break;
-    case 'bengali':
-      langCode = 'bn-IN';
-      break;
-    case 'marathi':
-      langCode = 'mr-IN';
-      break;
-    case 'gujarati':
-      langCode = 'gu-IN';
-      break;
-    case 'punjabi':
-      langCode = 'pa-IN';
-      break;
-    case 'english':
-      langCode = 'en-US';
-      break;
-    default:
-      langCode = 'en-US';
-  }
-  
-  recognition.lang = langCode;
-
-  // Keep track of the final transcript
-  let finalTranscript = '';
-
-  // Event handlers
-  recognition.onresult = (event) => {
-    let interimTranscript = '';
-    
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        finalTranscript += event.results[i][0].transcript;
-      } else {
-        interimTranscript += event.results[i][0].transcript;
-      }
-    }
-    
-    // Call the callback with the combined transcript
-    onResult(finalTranscript + interimTranscript);
-  };
-
-  recognition.onerror = (event) => {
-    console.error('Speech recognition error', event.error);
-    
-    // Special handling for common errors
-    if (event.error === 'no-speech') {
-      console.log('No speech detected');
-    } else if (event.error === 'aborted') {
-      console.log('Speech recognition aborted');
-    } else if (event.error === 'network') {
-      console.log('Network error occurred during speech recognition');
-    } else if (event.error === 'not-allowed') {
-      console.log('Speech recognition permission was denied');
-    }
-    
-    onEnd();
-  };
-
-  recognition.onend = () => {
-    console.log('Speech recognition ended');
-    onEnd();
-  };
-
-  // Start recognition
   try {
+    const recognition = new SpeechRecognition();
+    
+    // Get preferred language from localStorage
+    const preferredLanguage = localStorage.getItem("preferredLanguage") || "english";
+    
+    // Map preferred language to speech recognition language code
+    const languageMap: { [key: string]: string } = {
+      english: "en-US",
+      hindi: "hi-IN",
+      tamil: "ta-IN",
+      telugu: "te-IN",
+      bengali: "bn-IN",
+      marathi: "mr-IN",
+      gujarati: "gu-IN",
+      punjabi: "pa-IN",
+    };
+    
+    // Set recognition properties
+    recognition.lang = languageMap[preferredLanguage] || "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    
+    // Start recognition
     recognition.start();
-    console.log('Speech recognition started');
+    
+    // Handle results
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      onResult(transcript);
+    };
+    
+    // Handle end of speech
+    recognition.onend = () => {
+      onEnd();
+    };
+    
+    // Handle errors
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error", event.error);
+      onEnd();
+      
+      // Special handling for safety-related commands
+      if (window.location.pathname === "/safety") {
+        const errorMessage = event.error === "not-allowed" 
+          ? "Microphone access denied. Please check your browser permissions."
+          : "Speech recognition failed. Please try again or type your message.";
+          
+        toast({
+          title: "Voice Recognition Error",
+          description: errorMessage,
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    };
+    
+    // Listen for safety-related keywords
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      
+      // Special handling for emergency keywords
+      const emergencyKeywords = ["help me", "emergency", "sos", "danger", "call police"];
+      const lowerTranscript = transcript.toLowerCase();
+      
+      const isEmergency = emergencyKeywords.some(keyword => lowerTranscript.includes(keyword));
+      
+      if (isEmergency && window.location.pathname !== "/safety") {
+        // Redirect to safety hub for emergency keywords
+        toast({
+          title: "Emergency Command Detected",
+          description: "Redirecting to Safety Hub...",
+          duration: 2000,
+        });
+        
+        setTimeout(() => {
+          window.location.href = "/safety";
+        }, 1000);
+      } else {
+        // Normal processing for non-emergency commands
+        onResult(transcript);
+      }
+    };
+    
+    return recognition;
   } catch (error) {
-    console.error('Error starting speech recognition:', error);
+    console.error("Error initializing speech recognition:", error);
     onEnd();
     return null;
   }
-  
-  return recognition;
-};
-
-export { startSpeechRecognition };
+}
